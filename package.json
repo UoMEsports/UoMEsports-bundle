@@ -49,6 +49,5 @@
     "vue-template-compiler": "^2.6.6",
     "vuetify": "^1.5.2"
   },
-  "nodecg": {
-  }
+  "nodecg": {}
 }
