@@ -8,6 +8,13 @@ module.exports = {
 	rules: {
 		"indent": ["off"],
 		"@typescript-eslint/indent": ["error", 4],
-		"@typescript-eslint/no-use-before-define": ["off", { "functions": false}]
+		"@typescript-eslint/no-use-before-define": ["off", { "functions": false}],
+		"@typescript-eslint/explicit-function-return-type": [
+			"warn",
+			{
+			  allowExpressions: true,
+			  allowTypedFunctionExpressions: true,
+			}
+		]
 	},
 }

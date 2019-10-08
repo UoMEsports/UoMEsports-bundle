@@ -1,5 +1,3 @@
-import {Time} from '../types/time';
-
 /**
  * TimeObject class.
  * @property {Number} raw
@@ -9,63 +7,64 @@ import {Time} from '../types/time';
  * @property {String} formatted
  * @property {Number} timestamp
  */
-class TimeObject implements Time {
-
-    public hours: number;
-    public minutes: number;
-    public seconds: number;
-    public formatted: string;
-    public raw: number;
-    public timestamp: number;
-
+class TimeObject {
     /**
      * Constructs a new TimeObject with the provided number of seconds.
      * @param {Number} [seconds = 0] - The value to instantiate this TimeObject with, in seconds.
      */
-    public constructor(seconds: number = 0) {
-        this.setSeconds(seconds);
+    public constructor(seconds = 0) {
+        TimeObject.setSeconds(this, seconds);
     }
 
     /**
      * Increments a TimeObject by one second.
+     * @param {TimeObject} t - The TimeObject to increment.
+     * @returns {TimeObject} - The TimeObject passed in as an argument.
      */
-    public increment(): void {
-        this.raw++;
+    public static increment(t): TimeObject {
+        t.raw++;
 
-        const hms = TimeObject.secondsToHMS(this.raw);
-        this.hours = hms.h;
-        this.minutes = hms.m;
-        this.seconds = hms.s;
-        this.formatted = TimeObject.formatHMS(hms);
-        this.timestamp = Date.now();
+        const hms = TimeObject.secondsToHMS(t.raw);
+        t.hours = hms.h;
+        t.minutes = hms.m;
+        t.seconds = hms.s;
+        t.formatted = TimeObject.formatHMS(hms);
+        t.timestamp = Date.now();
+        return t;
     }
 
     /**
      * Decrements a TimeObject by one second.
+     * @param {TimeObject} t - The TimeObject to increment.
+     * @returns {TimeObject} - The TimeObject passed in as an argument.
      */
-    public decrement(): void {
-        this.raw--;
+    public static decrement(t): TimeObject {
+        t.raw--;
 
-        const hms = TimeObject.secondsToHMS(this.raw);
-        this.hours = hms.h;
-        this.minutes = hms.m;
-        this.seconds = hms.s;
-        this.formatted = TimeObject.formatHMS(hms);
-        this.timestamp = Date.now();
+        const hms = TimeObject.secondsToHMS(t.raw);
+        t.hours = hms.h;
+        t.minutes = hms.m;
+        t.seconds = hms.s;
+        t.formatted = TimeObject.formatHMS(hms);
+        t.timestamp = Date.now();
+        return t;
     }
 
     /**
      * Sets the value of a TimeObject.
+     * @param {TimeObject} t - The TimeObject to set.
      * @param {Number} seconds - The value to set to (in seconds).
+     * @returns {TimeObject} - The TimeObject passed in as an argument.
      */
-    public setSeconds(seconds: number): void {
+    public static setSeconds(t, seconds): TimeObject {
         const hms = TimeObject.secondsToHMS(seconds);
-        this.hours = hms.h;
-        this.minutes = hms.m;
-        this.seconds = hms.s;
-        this.formatted = TimeObject.formatHMS(hms);
-        this.raw = seconds;
-        this.timestamp = Date.now();
+        t.hours = hms.h;
+        t.minutes = hms.m;
+        t.seconds = hms.s;
+        t.formatted = TimeObject.formatHMS(hms);
+        t.raw = seconds;
+        t.timestamp = Date.now();
+        return t;
     }
 
     /**
@@ -73,7 +72,7 @@ class TimeObject implements Time {
      * @param {{h: number, m: number, s: number}} hms - The HMS object to format.
      * @returns {string} - The formatted time string.
      */
-    public static formatHMS(hms: {h: number; m: number; s: number}): string {
+    public static formatHMS(hms): string {
         let str = '';
         if (hms.h) {
             str += `${hms.h}:`;
@@ -88,7 +87,7 @@ class TimeObject implements Time {
      * @param {number} seconds - The number of seconds to format.
      * @returns {string} - The formatted time sting.
      */
-    public static formatSeconds(seconds: number): string {
+    public static formatSeconds(seconds): string {
         const hms = TimeObject.secondsToHMS(seconds);
         return TimeObject.formatHMS(hms);
     }
@@ -98,7 +97,7 @@ class TimeObject implements Time {
      * @param {number} seconds - A number of seconds.
      * @returns {{h: number, m: number, s: number}} - An HMS object.
      */
-    public static secondsToHMS(seconds: number): {h: number; m: number; s: number} {
+    public static secondsToHMS(seconds): {h: number; m: number; s: number} {
         return {
             h: Math.floor(seconds / 3600),
             m: Math.floor(seconds % 3600 / 60),
@@ -111,7 +110,7 @@ class TimeObject implements Time {
      * @param {string} timeString - The formatted time string to parse (hh:mm:ss or mm:ss).
      * @returns {number} - The parsed time string represented as seconds.
      */
-    public static parseSeconds(timeString: string): number {
+    public static parseSeconds(timeString): number {
         const timeParts = timeString.split(':');
         if (timeParts.length === 3) {
             return (parseInt(timeParts[0], 10) * 3600) + (parseInt(timeParts[1], 10) * 60) + parseInt(timeParts[2], 10);

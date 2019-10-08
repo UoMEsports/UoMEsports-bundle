@@ -1,8 +1,8 @@
 import {NodeCG} from '../../../../types/server';
 import * as nodecgApiContext from './util/nodecg-api-context';
 
-export = (nodecg: NodeCG) => {
+export = (nodecg: NodeCG): void => {
     nodecgApiContext.set(nodecg);
 
-    require('./example_extension');
+    require('./countdown');
 };

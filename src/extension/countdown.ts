@@ -1,107 +1,65 @@
 import * as nodecgApiContext from './util/nodecg-api-context';
+import * as TimeUtils from './lib/time';
+import {Countdown} from '../types/schemas/countdown';
+import {CountdownRunning} from '../types/schemas/countdownRunning';
 
 const nodecg = nodecgApiContext.get();
-
-const NanoTimer = require('nanotimer');
-const TimeObject = require('../shared/lib/vendor/time-object');
-
-const timer = new NanoTimer();
-const timerRep = nodecg.Replicant('timer', {
-    defaultValue: (function () {
-        const to = new TimeObject(300);
-        to.running = false;
-        to.hidden = false;
-        to.text = 'UP NEXT';
-        return to;
-    })()
+const time = nodecg.Replicant<Countdown>('countdown', {
+    defaultValue: TimeUtils.createTimeStruct(600 * 1000),
+    persistent: false
 });
+const running = nodecg.Replicant<CountdownRunning>('countdownRunning', {
+    defaultValue: false,
+    persistent: false
+});
+let countdownTimer: TimeUtils.CountdownTimer;
 
-// Load the existing time and start the timerRep at that.
-if (timerRep.value.running) {
-    start();
-}
-
-nodecg.listenFor('startTimer', start);
-nodecg.listenFor('stopTimer', stop);
-nodecg.listenFor('resetTimer', reset);
-nodecg.listenFor('setTimer', setDuration);
-nodecg.listenFor('setTimerEnd', setEnd);
-nodecg.listenFor('showHideTimer', showHide);
-nodecg.listenFor('setTimerText', setText);
+nodecg.listenFor('startCountdown', start);
+nodecg.listenFor('stopCountdown', stop);
 
 /**
- * Starts the timer.
- * @returns {undefined}
+ * Starts the countdown at the specified startTime.
+ * @param startTimeSeconds - Number of seconds to start the timer on.
  */
-function start(): void {
-    timer.clearInterval();
-    if (timerRep.value.raw <= 0) {
-        timerRep.value.running = false;
+function start(startTimeSeconds: number): void {
+    if (running.value) {
         return;
     }
-    timerRep.value.running = true;
-    timer.setInterval(tick, '', '1s');
-}
 
-/**
- * Decrements the timer by one second.
- * @returns {undefined}
- */
-function tick(): void {
-    TimeObject.decrement(timerRep.value);
-    if (timerRep.value.raw < 1) {
-        stop();
+    const durationMs = startTimeSeconds * 1000;
+    if (durationMs <= 0) {
+        return;
     }
+
+    running.value = true;
+    time.value = TimeUtils.createTimeStruct(durationMs);
+
+    if (countdownTimer) {
+        countdownTimer.stop();
+        countdownTimer.removeAllListeners();
+    }
+
+    countdownTimer = new TimeUtils.CountdownTimer(Date.now() + durationMs, {tickRate: 10});
+    countdownTimer.on('tick', remainingTimeStruct => {
+        time.value = remainingTimeStruct;
+        if (remainingTimeStruct.raw <= 0) stop();
+    });
 }
 
 /**
- * Stops the timer.
- * @returns {undefined}
+ * Stops the countdown.
  */
 function stop(): void {
-    timer.clearInterval();
-    timerRep.value.running = false;
-}
-
-/**
- * Stops and resets the timer
- * @returns {undefined}
- */
-function reset(): void {
-    stop();
-    TimeObject.setSeconds(timerRep.value, 0);
-}
-
-/**
- * Sets the timer to end at a specific timestamp
- * @param {number} ts - Unix timestamp at which to end timer
- * @returns {undefined}
- */
-function setEnd(ts: number): void {
-    const timeDiff = Math.max(ts - ((new Date).getTime() / 1000), 0);
-    if (timeDiff < 1) {
-        stop();
+    if (!running.value) {
+        return;
     }
 
-    TimeObject.setSeconds(timerRep.value, timeDiff);
-}
-
-/**
- * Sets the timer to end at a specific timestamp
- * @param {number} time - Number of seconds to set the timer to
- * @returns {undefined}
- */
-function setDuration(time: number): void {
-    if (time < 1) {
-        stop();
+    running.value = false;
+    if (countdownTimer) {
+        countdownTimer.stop();
     }
-    TimeObject.setSeconds(timerRep.value, time);
 }
 
-function showHide(): void {
-    timerRep.value.hidden = !timerRep.value.hidden;
-}
-
-function setText(text: string): void {
-    timerRep.value.text = text;
-}
+time.on('change', newVal => {
+    if (newVal.raw <= 0) running.value = false;
+});

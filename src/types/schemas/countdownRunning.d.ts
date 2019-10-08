@@ -5,7 +5,4 @@
  * and run json-schema-to-typescript to regenerate this file.
  */
 
-export interface ExampleSchema {
-	raw: number;
-	formatted: string;
-}
+export type CountdownRunning = boolean;

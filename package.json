@@ -1,5 +1,5 @@
 {
-  "name": "bundle-template",
+  "name": "uom-bundle",
   "version": "1.0.0",
   "author": {
     "name": "Daniel Shields",
@@ -27,10 +27,10 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.3.3",
-    "@chenfengyuan/vue-number-input": "^1.1.0",
+    "@chenfengyuan/vue-number-input": "^1.1.2",
     "@types/clone": "^0.1.30",
     "@types/luxon": "^1.11.1",
-    "@types/node": "^11.9.4",
+    "@types/node": "^11.13.21",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
     "@typescript-eslint/parser": "^1.4.2",
     "@vue/component-compiler-utils": "^2.5.2",
@@ -38,8 +38,12 @@
     "dart-sass": "^1.17.1",
     "eslint": "^5.15.1",
     "eslint-plugin-vue": "^5.2.2",
+    "milliseconds": "^1.0.3",
+    "nanotimer": "^0.3.15",
     "nodecg-vue": "^0.5.2",
     "parcel-bundler": "^1.11.0",
+    "parse-ms": "^2.1.0",
+    "postcss": "^7.0.18",
     "rimraf": "^3.0.0",
     "sass": "^1.17.1",
     "stylus": "^0.54.5",
@@ -49,5 +53,51 @@
     "vue-template-compiler": "^2.6.6",
     "vuetify": "^1.5.2"
   },
-  "nodecg": {}
+  "nodecg": {
+    "compatibleRange": "^1.5.0",
+    "dashboardPanels": [
+      {
+        "name": "countdown-panel",
+        "title": "Countdown",
+        "width": 2,
+        "file": "countdown-panel.html"
+      },
+      {
+        "name": "countdown-dialog-for",
+        "title": "Set Countdown",
+        "width": 4,
+        "dialog": true,
+        "dialogButtons": [
+          {
+            "name": "set",
+            "type": "confirm"
+          },
+          {
+            "name": "cancel",
+            "type": "dismiss"
+          }
+        ],
+        "file": "countdown-dialog-for.html"
+      },
+      {
+        "name": "countdown-dialog-to",
+        "title": "Set Countdown",
+        "width": 4,
+        "dialog": true,
+        "dialogButtons": [
+          {
+            "name": "set",
+            "type": "confirm"
+          },
+          {
+            "name": "cancel",
+            "type": "dismiss"
+          }
+        ],
+        "file": "countdown-dialog-to.html"
+      }
+    ],
+    "graphics": [
+    ]
+  }
 }
